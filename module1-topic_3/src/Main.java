@@ -2,6 +2,33 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
+
+    public static boolean check(int diff) {
+        Random rnd = new Random();
+        Scanner sc = new Scanner(System.in);
+        int x, y;
+        if (diff == 1) { // easy
+            x = rnd.nextInt(1, 100);
+            y = rnd.nextInt(1, 100);
+        } else if (diff == 2) { // HARD
+            x = rnd.nextInt(1, 300);
+            y = rnd.nextInt(1, 300);
+        }
+        else {
+            x = rnd.nextInt(1, 100);
+            y = rnd.nextInt(1, 100);
+        }
+        System.out.println("Чему равно x + y, если x =" + x + ", а y =" + y);
+        int answer = sc.nextInt();
+        if (answer == x+y) {
+            System.out.println("ВЕРНООО!! ты победил его!!");
+            return true;
+        }
+        else {
+            System.out.println("KYS");
+            return false;
+        }
+    }
     public static void main(String[] args) {
         String person = "\uD83E\uDDD9\u200D";
         int personLive = 3;
@@ -18,7 +45,6 @@ public class Main {
         String leftBlock = "| ";
         String rightBlock = "|";
         String wall = "+ —— + —— + —— +";
-        // \n, \t - как спец символ(упомянуть)
         String gamingField = "+ —— + —— + —— +\n"
                 + "|    |    | \uD83C\uDFE0 |\n"
                 + "+ —— + —— + —— +\n"
@@ -35,12 +61,12 @@ public class Main {
 
 
         int countMonster = sizeBoard * sizeBoard - sizeBoard - 1;
-        Random r = new Random();
+        Random rnd = new Random();
         for (int i = 0; i <= countMonster; i++) {
-            board[r.nextInt(sizeBoard - 1)][r.nextInt(sizeBoard)] = monster;
+            board[rnd.nextInt(sizeBoard - 1)][rnd.nextInt(sizeBoard)] = monster;
         }
 
-        int castleX = r.nextInt(sizeBoard);
+        int castleX = rnd.nextInt(sizeBoard);
         int castleY = 0;
 
 
@@ -65,18 +91,6 @@ public class Main {
 
                 while (true) {
                     board[personY - 1][personX - 1] = person;
-//                    System.out.println(output_str);
-//                    for (int y = 0; y < sizeBoard; y++) {
-//                        System.out.println(wall);
-//                        for (int x = 0; x < sizeBoard; x++) {
-////                            if (personY - 1 == y && personX - 1 == x) System.out.print(leftBlock + person + " ");
-////                            else System.out.print(leftBlock + "   ");
-//                            System.out.print(leftBlock + board[y][x] + " ");
-//                        }
-//                        System.out.println(rightBlock);
-//                    }
-//                    System.out.println(wall);
-
                     for (String[] raw : board) {
                         System.out.println(wall);
                         for (String col : raw) {
@@ -110,13 +124,23 @@ public class Main {
                             System.out.println("Вы прошли игру!");
                             break;
                         } else {
-                            System.out.println("Решите задачу.");
+                            boolean flag;
+                            if (personLive == 0) {
+                                flag = check(1);
+                            } else {
+                                flag = check(2);
+                            }
+
+                            if (!flag) {
+                                personLive--;
+                            }
+                            else personLive++;
                         }
                     } else {
                         System.out.println("Координаты не изменены");
                     }
 
-                    if (personLive <= 0) {
+                    if (personLive < 0) {
                         break;
                     }
                 }
