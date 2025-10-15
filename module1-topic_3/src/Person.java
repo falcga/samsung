@@ -1,10 +1,9 @@
-import java.util.Random;
 import java.util.Scanner;
 
 public class Person {
     private int x;
     private int y;
-    private String image = "\uD83E\uDDD9\u200D";
+    private String image = "☕";
     private int lives = 3;
     private final int maxLives = 3;
     private Scanner scanner = new Scanner(System.in);
@@ -14,72 +13,41 @@ public class Person {
         this.y = startY;
     }
 
-    public boolean processMove(String[][] board, String castle, String monster) {
+    public boolean processMove(String[][] board, String castle, Monster[] monsters) {
         System.out.println("Введите куда будет ходить персонаж (ход возможен только по вертикали и горизонтали на одну клетку)");
-        System.out.println("Координаты персонажа - (x: " + x + ", y: " + y + ")");
+        System.out.println("Координаты персонажа - (x: " + (x + 1) + ", y: " + (y + 1) + ")");
 
-        int targetX = scanner.nextInt();
-        int targetY = scanner.nextInt();
-        System.out.println("Выбранные координаты: " + targetX + ", " + targetY);
+        int targetX = scanner.nextInt() - 1;
+        int targetY = scanner.nextInt() - 1;
+        System.out.println("Выбранные координаты: " + (targetX + 1) + ", " + (targetY + 1));
 
         if (!isMoveCorrect(targetX, targetY)) {
             System.out.println("Некорректный ход! Можно ходить только на одну клетку по вертикали или горизонтали.");
             return false;
         }
 
-        String targetCell = board[targetY - 1][targetX - 1];
+        String targetCell = board[targetY][targetX];
 
         if (targetCell.equals("  ")) {
-            board[y - 1][x - 1] = "  ";
+            board[y][x] = "  ";
             this.x = targetX;
             this.y = targetY;
-            board[y - 1][x - 1] = image;
-            System.out.println("Ход корректный; Новые координаты: " + x + ", " + y);
+            board[y][x] = image;
+            System.out.println("Ход корректный; Новые координаты: " + (x + 1) + ", " + (y + 1));
             return true;
-        }
-        else if (targetCell.equals(castle)) {
+        } else if (targetCell.equals(castle)) {
             System.out.println("🎉 Вы достигли замка! Победа!");
             return true;
-        }
-        else if (targetCell.equals(monster)) {
-            System.out.println("👾 Встретился монстр! Решите пример чтобы продолжить:");
-            boolean battleResult = handleMonsterBattle();
-
-            if (!battleResult) {
-                decreaseLives();
-                System.out.println("💔 Неправильный ответ! Потеряна жизнь.");
-            } else {
-                System.out.println("✅ Правильно! Монстр побежден!");
-                board[y - 1][x - 1] = "  ";
-                this.x = targetX;
-                this.y = targetY;
-                board[y - 1][x - 1] = image;
+        } else {
+            // Проверяем, не монстр ли это
+            for (Monster monster : monsters) {
+                if (monster.conflictPerson(targetX, targetY)) {
+                    return monster.monsterHere(this, board);
+                }
             }
-            return true;
-        }
-        else {
             System.out.println("Эта клетка занята!");
             return false;
         }
-    }
-
-    private boolean handleMonsterBattle() {
-        Random rnd = new Random();
-        int difficulty = (lives == 0) ? 1 : 2;
-
-        int num1, num2;
-        if (difficulty == 1) { // easy
-            num1 = rnd.nextInt(100) + 1;
-            num2 = rnd.nextInt(100) + 1;
-        } else { // hard
-            num1 = rnd.nextInt(300) + 1;
-            num2 = rnd.nextInt(300) + 1;
-        }
-
-        System.out.println("Чему равно " + num1 + " + " + num2 + "?");
-        int answer = scanner.nextInt();
-
-        return answer == (num1 + num2);
     }
 
     public boolean isMoveCorrect(int targetX, int targetY) {
@@ -119,7 +87,7 @@ public class Person {
     }
 
     public boolean hasReachedCastle(String[][] board, String castle) {
-        return board[y - 1][x - 1].equals(castle);
+        return board[y][x].equals(castle);
     }
 
     public void updateBoardPosition(String[][] board) {
@@ -130,7 +98,7 @@ public class Person {
                 }
             }
         }
-        board[y - 1][x - 1] = image;
+        board[y][x] = image;
     }
 
     public int getX() {
@@ -158,11 +126,10 @@ public class Person {
         this.y = y;
     }
 
-    // Информация о персонаже
     public void printStatus() {
         System.out.println("=== СТАТУС ПЕРСОНАЖА ===");
         System.out.println("Персонаж: " + image);
-        System.out.println("Позиция: (" + x + ", " + y + ")");
+        System.out.println("Позиция: (" + (x + 1) + ", " + (y + 1) + ")");
         System.out.println("Жизни: " + lives + "/" + maxLives);
         System.out.println("Статус: " + (isAlive() ? "❤️ Жив" : "💀 Мёртв"));
         System.out.println("========================");

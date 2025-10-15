@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -5,12 +6,18 @@ public class Main {
 
     public static void main(String[] args) {
         Board brd = new Board();
-        String monster = "\uD83E\uDDDF\u200D";
+        String monsterImage = "\uD83E\uDDDF\u200D";
         String castle = "\uD83C\uDFF0";
         int sizeBoard = 3;
 
-        Person player = new Person(1, 3);
-        String[][] board = brd.gameMapGenerate(sizeBoard, player.getImage(), monster, castle);
+        // Создание массива монстров
+        Monster[] monsters = new Monster[sizeBoard - 1];
+        for (int i = 0; i < monsters.length; i++) {
+            monsters[i] = new Monster(sizeBoard);
+        }
+
+        Person player = new Person(0, sizeBoard - 1); // Начинаем в левом нижнем углу
+        String[][] board = brd.gameMapGenerate(sizeBoard, player.getImage(), monsterImage, castle, monsters);
 
         System.out.println("Привет! Ты готов начать играть в игру? (Напиши: ДА или НЕТ)");
 
@@ -24,15 +31,16 @@ public class Main {
                 int difficultGame = sc.nextInt();
                 System.out.println("Выбранная сложность:\t" + difficultGame);
 
-                while (player.isAlive()) {
-                    player.updateBoardPosition(board);
+                // Начальная позиция игрока
+                board[player.getY()][player.getX()] = player.getImage();
 
+                while (player.isAlive()) {
                     displayBoard(board);
 
                     System.out.println("Количество жизней:\t" + player.getLives() + "\n");
                     System.out.println("Ход номер: " + (++step) + "\n");
 
-                    boolean moveProcessed = player.processMove(board, castle, monster);
+                    boolean moveProcessed = player.processMove(board, castle, monsters);
 
                     if (player.hasReachedCastle(board, castle)) {
                         System.out.println("🎊 Поздравляем! Вы выиграли!");
