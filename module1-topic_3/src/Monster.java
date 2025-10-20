@@ -2,14 +2,16 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Monster {
-    private Scanner sc = new Scanner(System.in);
-    private String image = "\uD83E\uDDDF\u200D";
-    private int x, y;
-    private Random rnd = new Random();
+    protected Scanner sc = new Scanner(System.in);
+    protected String image = "\uD83E\uDDDF\u200D";
+    protected int x, y;
+    protected Random rnd = new Random();
+    protected int difficultyLevel;
 
-    public Monster(int sizeBoard) {
+    public Monster(int sizeBoard, int difficultyLevel) {
         this.y = rnd.nextInt(sizeBoard);
         this.x = rnd.nextInt(sizeBoard);
+        this.difficultyLevel = difficultyLevel;
     }
 
     public String getImage() {
@@ -47,27 +49,32 @@ public class Monster {
             return false;
         } else {
             System.out.println("✅ Правильно! Монстр побежден!");
-            // Монстр исчезает с карты
             board[this.y][this.x] = "  ";
             return true;
         }
     }
 
-    private boolean handleMonsterBattle(Person player) {
-        int difficulty = (player.getLives() > 1) ? 2 : 1;
-
+    protected boolean handleMonsterBattle(Person player) {
         int num1, num2;
-        if (difficulty == 1) { // easy
-            num1 = rnd.nextInt(100) + 1;
-            num2 = rnd.nextInt(100) + 1;
-        } else { // hard
-            num1 = rnd.nextInt(300) + 1;
-            num2 = rnd.nextInt(300) + 1;
-        }
+        int maxNumber = getMaxNumberForDifficulty();
+
+        num1 = rnd.nextInt(maxNumber) + 1;
+        num2 = rnd.nextInt(maxNumber) + 1;
 
         System.out.println("Чему равно " + num1 + " + " + num2 + "?");
         int answer = sc.nextInt();
 
         return answer == (num1 + num2);
+    }
+
+    protected int getMaxNumberForDifficulty() {
+        switch (difficultyLevel) {
+            case 1: return 50;   // Легко
+            case 2: return 100;  // Средне
+            case 3: return 200;  // Сложно
+            case 4: return 300;  // Очень сложно
+            case 5: return 500;  // Эксперт
+            default: return 100;
+        }
     }
 }

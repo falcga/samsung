@@ -8,20 +8,11 @@ public class Main {
         Board brd = new Board();
         String monsterImage = "\uD83E\uDDDF\u200D";
         String castle = "\uD83C\uDFF0";
-        int sizeBoard = 3;
-
-        // Создание массива монстров
-        Monster[] monsters = new Monster[sizeBoard - 1];
-        for (int i = 0; i < monsters.length; i++) {
-            monsters[i] = new Monster(sizeBoard);
-        }
-
-        Person player = new Person(0, sizeBoard - 1); // Начинаем в левом нижнем углу
-        String[][] board = brd.gameMapGenerate(sizeBoard, player.getImage(), monsterImage, castle, monsters);
-
-        System.out.println("Привет! Ты готов начать играть в игру? (Напиши: ДА или НЕТ)");
+        int sizeBoard = 5;
 
         Scanner sc = new Scanner(System.in);
+        System.out.println("Привет! Ты готов начать играть в игру? (Напиши: ДА или НЕТ)");
+
         String answer = sc.nextLine();
         System.out.println("Ваш ответ:\t" + answer);
 
@@ -31,7 +22,12 @@ public class Main {
                 int difficultGame = sc.nextInt();
                 System.out.println("Выбранная сложность:\t" + difficultGame);
 
-                // Начальная позиция игрока
+                Monster[] monsters = new Monster[sizeBoard - 1];
+                Wall[] walls = new Wall[Math.max(1, sizeBoard / 2)];
+
+                Person player = new Person(0, sizeBoard - 1);
+                String[][] board = brd.gameMapGenerate(sizeBoard, player.getImage(), monsterImage, castle, monsters, walls, difficultGame);
+
                 board[player.getY()][player.getX()] = player.getImage();
 
                 while (player.isAlive()) {
@@ -40,7 +36,7 @@ public class Main {
                     System.out.println("Количество жизней:\t" + player.getLives() + "\n");
                     System.out.println("Ход номер: " + (++step) + "\n");
 
-                    boolean moveProcessed = player.processMove(board, castle, monsters);
+                    boolean moveProcessed = player.processMove(board, castle, monsters, walls);
 
                     if (player.hasReachedCastle(board, castle)) {
                         System.out.println("🎊 Поздравляем! Вы выиграли!");
@@ -64,7 +60,9 @@ public class Main {
     }
 
     private static void displayBoard(String[][] board) {
-        String wall = "+ —— + —— + —— +";
+        int size = board.length;
+        String wall = "+ —— ".repeat(size) + "+";
+
         for (String[] raw : board) {
             System.out.println(wall);
             for (String col : raw) {

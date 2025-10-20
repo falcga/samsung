@@ -13,7 +13,7 @@ public class Person {
         this.y = startY;
     }
 
-    public boolean processMove(String[][] board, String castle, Monster[] monsters) {
+    public boolean processMove(String[][] board, String castle, Monster[] monsters, Wall[] walls) {
         System.out.println("Введите куда будет ходить персонаж (ход возможен только по вертикали и горизонтали на одну клетку)");
         System.out.println("Координаты персонажа - (x: " + (x + 1) + ", y: " + (y + 1) + ")");
 
@@ -23,6 +23,11 @@ public class Person {
 
         if (!isMoveCorrect(targetX, targetY)) {
             System.out.println("Некорректный ход! Можно ходить только на одну клетку по вертикали или горизонтали.");
+            return false;
+        }
+
+        if (isWallAtPosition(walls, targetX, targetY)) {
+            System.out.println("🧱 Здесь стена! Вы не можете пройти.");
             return false;
         }
 
@@ -39,15 +44,23 @@ public class Person {
             System.out.println("🎉 Вы достигли замка! Победа!");
             return true;
         } else {
-            // Проверяем, не монстр ли это
             for (Monster monster : monsters) {
-                if (monster.conflictPerson(targetX, targetY)) {
+                if (monster != null && monster.conflictPerson(targetX, targetY)) {
                     return monster.monsterHere(this, board);
                 }
             }
             System.out.println("Эта клетка занята!");
             return false;
         }
+    }
+
+    private boolean isWallAtPosition(Wall[] walls, int targetX, int targetY) {
+        for (Wall wall : walls) {
+            if (wall != null && wall.isWallAt(targetX, targetY)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isMoveCorrect(int targetX, int targetY) {
